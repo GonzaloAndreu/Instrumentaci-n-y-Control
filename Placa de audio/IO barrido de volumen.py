@@ -39,10 +39,10 @@ Esto abre un flujo en determinado aparato, con  ciertos parametros de
 audio, para poder grabar o reproducir audio. Es decir, Configura
  p.Stream para reproducir o grabar audio
 '''
-volume = 0.5     # range [0.0, 1.0]
+#volume = ver abajo     # range [0.0, 1.0]
 fs = 44100       # sampling rate, Hz, must be integer
 duration = 0.6   # in seconds, may be float
-#f = 261.626        # sine frequency, Hz, may be float
+f = 440          # sine frequency, Hz, may be float
 
 # for paFloat32 sample values must be in range [-1.0, 1.0]
 #esto dos objetos de aca abajo podrian capaz definirse como uno solo pero asi como estan, funcionan
@@ -60,39 +60,25 @@ record = p.open(format=FORMAT,     # Tipos de formato paFloat32, paInt32, paInt2
  
 # play. May repeat with different volume values (if done interactively) 
 
-logFi=np.log10(1)
-logFf=np.log10(25000)
-F = np.logspace(logFi,logFf,50)
+volume = np.linspace(0.02,1,50)
 Wave_Amplitude=[]
 Wave_Amplitude_Deviation=[]
-for i in F:
-    f=i
-    if i<10:
-        d=5
-    else:
-        d=duration
-    samples = (np.sin(2*np.pi*np.arange(fs*2*d)*f/fs)).astype(np.float32)
-    stream.write(volume*samples)
+for v in volume:
+    samples = (np.sin(2*np.pi*np.arange(fs*2*duration)*f/fs)).astype(np.float32)
+    stream.write(v*samples)
 
 
     print("* recording")
  
     frames = []
- 
-  
-    f=i
-    if i<10:
-        SECONDS=5
-    else:
-        SECONDS=RECORD_SECONDS 
-    for j in range(0, int( (RATE / CHUNK) * SECONDS)):  # Si el numero es chico como usa la funcion int redondea a cero y no da nada.
+         
+    for j in range(0, int( (RATE / CHUNK) * RECORD_SECONDS)):  # Si el numero es chico como usa la funcion int redondea a cero y no da nada.
         data = record.read(CHUNK)  # Lee la data del audio del stream CHUNK
         frames.append(data)
   
     
     print("* done recording")
- 
-    
+   
     
 #     
     wave = np.fromstring(b''.join(frames),dtype=np.int16)
@@ -118,8 +104,8 @@ stream.stop_stream()
 record.close()
 stream.close()
 
-plt.loglog(F,Wave_Amplitude)
-plt.plot(F,Wave_Amplitude)
+
+plt.plot(volume,Wave_Amplitude)
 plt.show()
 #t = np.linspace(0,RECORD_SECONDS,num=audio.size)
 #plt.plot(t,audio)
@@ -128,8 +114,10 @@ plt.show()
 
 
 p.terminate()    # termina la sesion de portaudio
-Freq_Amp_StdAmp=np.column_stack((np.ndarray.tolist(F),Wave_Amplitude,Wave_Amplitude_Deviation))
-timestr = time.strftime("%Y%m%d-%H%M%S")
-file_name = "FreqData {}".format(timestr)
-np.save(file_name, Freq_Amp_StdAmp)
+Vol_Amp_StdAmp=np.column_stack((np.ndarray.tolist(volume),Wave_Amplitude,Wave_Amplitude_Deviation))
+#with open ('rawdata.txt','w') as f:
+#    f.write(Freq_Amp_StdAmp)
 
+timestr = time.strftime("%Y%m%d-%H%M%S")
+file_name = "volData {}".format(timestr)
+np.save(file_name, Vol_Amp_StdAmp)
