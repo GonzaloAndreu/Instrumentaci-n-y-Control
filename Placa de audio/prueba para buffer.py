@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Tue Apr 23 19:39:03 2019
 
@@ -8,12 +7,14 @@ Created on Tue Apr 23 19:39:03 2019
 import pyaudio
 import numpy as np
 import matplotlib.pyplot as plt
+import array
+import sys
  
 CHUNK = 1024  # CAntidad de frames por buffer
 FORMAT = pyaudio.paInt16  # SI CAMBIO EL TIPO DE DATO CAMBIAR EL VARIABLE AUDIO
 CHANNELS = 1
-RATE = 47000
-RECORD_SECONDS = 0.3
+RATE = 96000
+RECORD_SECONDS = 20
 WAVE_OUTPUT_FILENAME = "output.wav"
  
 p = pyaudio.PyAudio()  # Configura el sistema de PortAudio
@@ -48,25 +49,21 @@ stream = p.open(format=FORMAT,     # Tipos de formato paFloat32, paInt32, paInt2
  
 print("* playing")
 
-t = np.linspace(0,RECORD_SECONDS,48000) 
-seno = np.sin(t/(CHUNK*RATE) *2*np.pi)
-
+#t = np.linspace(0,RECORD_SECONDS,48000) 
+#seno = np.sin(t/(CHUNK*RATE) *2*np.pi)
+j=1
+while 0<1:
 #frames = []
-data = stream.write(seno)
+    t = np.linspace(0,0,j) 
+    stream.write(np.float16(t))
+    sys.setrecursionlimit(max(3000,j+1))
+    j=j+1
 #frames.append(data)
 
  
 print("* done playing")
- 
+sys.setrecursionlimit(3000)
+print(i) 
 stream.stop_stream()   # Pausa la grabacion
 stream.close()     # termina el stream
-p.terminate()    # termina la sesion de portaudio
- 
-#time = []
- 
- 
-#audio = np.fromstring(b''.join(frames),dtype=np.int16)
-
-
-#plt.plot(t,data)
-#plt.show()
+p.terminate() 

@@ -15,8 +15,8 @@ class GeneradorFunciones(MessageBasedDriver):
         return self.query('*IDN?')    
     
     @Feat() #esto deberia encender o apagar el canal utilizando ON u OFF, por defecto es el canal 1
-    def power(self, STAT, OUTP = 1):
-        self.write("OUTPut {}:STATe {}".format(channel))
+    def power(self, STATe, OUTPut = 1):
+        self.write("OUTPut {}:STATe {}".format(OUTPut, STATe))
         
     @Feat()
     def frequency(self, channel = 1): #frequency('numero') te devuelve la frequencia del canal 'numero'
