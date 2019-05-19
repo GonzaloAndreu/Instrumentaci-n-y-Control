@@ -12,13 +12,12 @@ import matplotlib.pyplot as plt
 CHUNK = 1024  # CAntidad de frames por buffer
 FORMAT = pyaudio.paInt16  # SI CAMBIO EL TIPO DE DATO CAMBIAR EL VARIABLE AUDIO
 CHANNELS = 1
-RATE = 44100
-<<<<<<< HEAD
-RECORD_SECONDS = 5
-=======
-RECORD_SECONDS = 0.01951232399646889
 
->>>>>>> 7ee964fefb95e0cf11ef2ad4f1a1c7512d8d1102
+RATE = 96000   # 44100, 48000, 96000, 192000
+RECORD_SECONDS = 2
+
+
+#>>>>>>> 7ee964fefb95e0cf11ef2ad4f1a1c7512d8d1102
 WAVE_OUTPUT_FILENAME = "output.wav"
  
 p = pyaudio.PyAudio()  # Configura el sistema de PortAudio
@@ -76,3 +75,17 @@ audio = np.fromstring(b''.join(frames),dtype=np.int16)
 t = np.linspace(0,RECORD_SECONDS,num=audio.size)
 plt.plot(t,audio)
 plt.show()
+
+#%%
+# Programa para la calibracion 
+
+Amp=0.3 #volts (voltaje de entrada seteado en el generador de funciones)
+f= 200
+Raw= Amp*np.sin(2*np.pi*f*(t-t[187580]))
+
+
+plt.plot(t,Raw)
+
+plt.plot(t,audio/max(audio))
+
+plt.plot(Raw,audio)

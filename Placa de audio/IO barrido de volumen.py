@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 23 16:24:15 2019
 
-@author: macabre
+Created on Tue May 14 15:13:41 2019
+
+@author: Publico
 """
+
+
 import time
 import pyaudio
 import numpy as np
@@ -17,8 +20,8 @@ RECORD_SECONDS = 0.5
 WAVE_OUTPUT_FILENAME = "output.wav"
  
 p = pyaudio.PyAudio()  # Configura el sistema de PortAudio
-'''
 
+RawData=[]
 
 print("Input Device Info")
 print(p.get_default_input_device_info())
@@ -82,6 +85,9 @@ for v in volume:
     
 #     
     wave = np.fromstring(b''.join(frames),dtype=np.int16)
+
+    RawData.append(wave)
+
     
     Average = np.mean(wave)
     Data0=abs(wave-Average)
@@ -120,4 +126,6 @@ Vol_Amp_StdAmp=np.column_stack((np.ndarray.tolist(volume),Wave_Amplitude,Wave_Am
 
 timestr = time.strftime("%Y%m%d-%H%M%S")
 file_name = "volData {}".format(timestr)
+
 np.save(file_name, Vol_Amp_StdAmp)
+
