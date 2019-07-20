@@ -1,0 +1,126 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jun 11 19:02:27 2019
+
+@author: Publico
+"""
+
+from lantz.ino import INODriver, BoolFeat, QuantityFeat, BoolDictFeat, QuantityDictFeat
+from lantz.qt import Backend, Frontend, InstrumentSlot
+
+class FLOWPIDDriver(INODriver):
+        
+#    def __init__(self,Kp,Ki,Kd,Set_Point):
+#        self.Kp = Kp
+#        self.Ki = Ki
+#        self.Kd = Kd
+#        self.Set_Point = Set_Point
+        
+    control_loop_enabled=BoolFeat('Control_Loop_enabled')
+    Kp=QuantityFeat('Kp')
+    Ki=QuantityFeat('Ki')
+    Kd=QuantityFeat('Kd')
+    set_point=QuantityFeat('Set_Point', units='L/hour')
+    flow_value = QuantityFeat('Flow', units = 'L/hour', setter=False) # Si agrego este argumento: setter=False, entonces la funcion en el sketch de Arduino se genera sin setter.
+#    valve_opened = BoolDictFeat('Valve_Opened', keys=(1, 2))
+    pump_flow = QuantityDictFeat('Pump_Flow', keys=(1, 2) , units = 'L/hour')
+    
+   
+''' Hay dos maneras de escribir que las valvulas se puedan abrir o cerrar
+en ambos casos conviene ser especifico con lo que hace la función. La primer 
+forma consiste en dar dos funciones distintas, una para cada valvula que valga
+true si esta abierta o false si la quiero cerrar. La otra forma es usar el 
+BoolDictFeat para armar un diccionario entonces ademas de tomar los valores
+True/False, toma los valores 1 o 2 dependiendo de que valvula quiero usar.  '''
+#    valve_1_opened = BoolFeat('OPEN_VALVE_1')
+#    vavle_2_opened = BoolFeat('OPEN_VALVE_2')
+    
+    
+ 
+#
+#class FLOWPIDBackend(Backend):
+#    board: FLOWPIDDriver = InstrumentSlot
+#    def enable_control_loop_method(self):
+#        self.board.control_loop = True
+#    
+#    def disable_control_loop_method(self):
+#        self.board.control_loop = False
+#        
+#    def set_Kp(self):
+#        self.board.Kp = self.board.Kp
+#
+#    def get_Kp(self):
+#        print(Kp)
+#        
+#    def set_Ki(self):
+#        self.board.Ki = self.board.Ki
+#        
+#    def get_Ki(self):
+#        print(Ki)
+#        
+#    def set_Kd(self):
+#        self.board.Kd = self.board.Kd
+#
+#    def get_Kd(self):
+#        print(Kd)
+#        
+#    def set_set_point(self):
+#        self.board.set_point = self.board.Set_Point
+#
+#    def get_set_point(self):
+#        print(self.board.Set_Point)
+#        
+#    def set_pump_flow(self,no):
+#        self.board.pump_flow[no]= self.board.pump_flow[no]
+#
+#    def get_pump_flow(self,no):
+#        print(self.board.pump_flow[no])
+#        
+#        
+#    def get_flow(self):
+#        print(self.board.flow_value)
+#        
+#    def set_flow(self,Flow_Value):
+#        self.board.flow_value = self.board.flow
+#        
+#class FLOWPIDUserInterfase(Frontend):
+#    gui = 'FLOWPID.ui'
+#
+#    def connect_backend(self):
+#        super().connect_backend()
+#        self.widget.enable_control_loop_button.clicked.connect(self.backend.enable_control_loop_method)
+#        self.widget.disable_control_loop_button.clicked.connect(self.backend.disable_control_loop_method)
+
+
+
+if __name__ == '__main__':
+    from lantz.core.log import log_to_screen, log_to_socket, DEBUG
+    from lantz.qt import start_gui_app, wrap_driver_cls, QtCore
+    import time
+    
+    # ~ log_to_socket(DEBUG) # Uncommment this line to log to socket
+    log_to_screen(DEBUG) # or comment this line to stop logging
+
+''' Inicializamos el programa definiendo las variables'''
+    board = FLOWPID.via_packfile('FLOWPIDDriver.pack.yaml', check_update=True)
+    board.initialize()    
+    board.Kp = 8
+    board.Ki = 5
+    board.Kd = 2
+    board.Set_point = 100
+    board.control_loop_enabled= True
+    board.pump_flow[1] = 0
+    board.pump_flow[2] = 0
+    
+    ''' Guardamos los valores de flujo por el caudalimetro en intervalos
+    de X ms. ''' 
+    interval= 500
+    flow_data=[]
+    i=1
+    board.timer = QtCore.QTimer()
+    board.timer.setInterval(interval) # ms
+    board.timer.timeout.connect(flow_data.append([board.flow_value,interval*i,board.pump_flow[1],board.pump_flow[2]]),i++)
+    
+
+
+
